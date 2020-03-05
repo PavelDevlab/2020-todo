@@ -1,12 +1,21 @@
 
-import React, { ReactElement } from 'react';
+import React from 'react';
+import { Route, Switch } from 'react-router';
 
-const App = ():ReactElement => {
+import NotFoundPage from 'app/components/pages/NotFoundPage';
+import Tasks from 'app/components/pages/Tasks';
+
+const App = ():JSX.Element => {
 
     return (
-        <div>
-          App
-        </div>
+        <Switch>
+          <Route path="/" exact={true}>
+            <Tasks />
+          </Route>
+          <Route path="*">
+            <NotFoundPage />
+          </Route>
+        </Switch>
     );
 };
 

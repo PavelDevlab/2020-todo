@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { hydrate } from 'react-dom';
+import ReactDOM from 'react-dom';
 
 import { Router } from 'react-router';
 import App from 'app/components/App';
@@ -8,7 +8,7 @@ import App from 'app/components/App';
 import StyleContext from 'isomorphic-style-loader/StyleContext';
 import { Provider } from "mobx-react";
 
-import articlesStore from "./stores/todos";
+import tasksStore from "./stores/TasksStore";
 
 import { createBrowserHistory } from 'history';
 
@@ -16,7 +16,7 @@ const history = createBrowserHistory();
 
 
 const stores = {
-  articlesStore
+  tasksStore
 };
 
 const insertCss = (...styles:any[]) => {
@@ -27,7 +27,7 @@ const insertCss = (...styles:any[]) => {
 
 export const browserRender = () => {
 
-  hydrate(
+  ReactDOM.render(
     <Provider {...stores}>
       <StyleContext.Provider value={{ insertCss }}>
         <Router history={history}>

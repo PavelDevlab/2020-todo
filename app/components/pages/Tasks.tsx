@@ -1,0 +1,85 @@
+
+import React, { useCallback } from 'react';
+import { inject, observer } from "mobx-react";
+import {compose} from 'app/services/utils';
+import {TasksStore, TaskItemRequest} from 'app/stores/TasksStore';
+import TodoForm from 'app/components/CreateTodoForm';
+import TaskItemComponent from 'app/components/TaskItemComponent';
+
+import PropTypes from "prop-types";
+
+const propTypes = {
+  tasksStore: PropTypes.object.isRequired
+};
+
+type TasksProps = {
+  tasksStore: TasksStore
+};
+
+const useTodosHandlers = (tasksStore:TasksStore) => {
+  return {
+    filterByDone: useCallback(
+      ():void => {tasksStore.isDoneFilter === true ? tasksStore.clearFilters() : tasksStore.setIsDone(true);},
+      []
+    ),
+    filterByUndone: useCallback(
+      ():void => {tasksStore.isDoneFilter === false ? tasksStore.clearFilters() : tasksStore.setIsDone(false);},
+      []
+    ),
+    deleteTask: useCallback(
+      (task):void => {tasksStore.deleteTask(task.id);},
+      []
+    ),
+    onCreateFormSubmit: useCallback(
+      (task:TaskItemRequest):void => {tasksStore.createTask(task);},
+      []
+    )
+  };
+};
+
+const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
+
+  const handler = useTodosHandlers(tasksStore); // useTodosHandlers(tasksStore);
+
+  return (
+    <div>
+      <h2>Tasks</h2>
+      <label>
+        <input type="checkbox"
+               checked={tasksStore.isDoneFilter === true}
+               onChange={handler.filterByDone}
+        />
+        Filter by done
+      </label>
+      <br />
+      <label>
+        <input type="checkbox"
+               checked={tasksStore.isDoneFilter === false}
+               onChange={handler.filterByUndone}
+        />
+        Filter by undone
+      </label>
+      <ul>
+        {tasksStore.filtedTasks.map((task) =>{
+          return (
+            <TaskItemComponent
+              key={task.id}
+              task={task}
+              onDelete={handler.deleteTask}
+            />
+          );
+        })}
+      </ul>
+      <TodoForm
+        onSubmit={handler.onCreateFormSubmit}
+      />
+    </div>
+  );
+};
+
+Tasks.propTypes = propTypes;
+
+export default compose(
+  inject('tasksStore'),
+  observer
+)(Tasks);
