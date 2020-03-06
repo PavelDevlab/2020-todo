@@ -1,4 +1,4 @@
-import { observable, action, computed } from 'mobx';
+import { observable, action, computed, observe, IObjectDidChange } from 'mobx';
 
 export interface TaskItemRequest {
   info: string,
@@ -11,11 +11,15 @@ export type TaskItem = TaskItemRequest & {
 
 export class TasksStore {
 
+  constructor() {
+    this.loadDataFromStore();
+  }
+
   @observable tasks:TaskItem[] = [];
 
   @observable isDoneFilter:boolean|null = null;
 
-  @observable lastId: number = 0;
+  @observable lastId = 0;
 
   getIndexTaskById(targetId:number):number {
     return this.tasks.findIndex(c => c.id === targetId);
@@ -24,6 +28,19 @@ export class TasksStore {
   getNextId():number {
     this.lastId += 1;
     return this.lastId;
+  }
+
+  updateLastId(id:number|string) {
+    if (typeof id === 'string') {
+      if (isFinite(parseInt(id, 10))) {
+        id = parseInt(id, 10);
+      } else {
+        return;
+      }
+    }
+    if (this.lastId < id) {
+      this.lastId = id;
+    }
   }
 
   @action clear():void {
@@ -73,6 +90,29 @@ export class TasksStore {
     return false;
   }
 
+  @action loadDataFromStore() {
+    const lsKeyReg = new RegExp("^" + TasksStore.lsKeyPrefix);
+    Object.entries(localStorage)
+      .filter(([key]) => lsKeyReg.test(key))
+      .map(([, item]) => {
+        try {
+          item = JSON.parse(item);
+          return item;
+        } catch (e) { return; }
+      })
+      .filter((item) => !!item)
+      .sort((a,b) => {
+        if (a.id > b.id) return 1;
+        if (a.id < b.id) return -1;
+        return 0;
+      })
+      .forEach((item:TaskItem) => {
+        this.updateLastId(item.id);
+        this.tasks.push(item);
+      });
+      // localStorage.getItem(lsKey)
+  }
+
   private static instance:TasksStore|null = null;
 
   public static create():TasksStore {
@@ -81,6 +121,39 @@ export class TasksStore {
     }
     return TasksStore.instance;
   }
+
+  static lsKeyPrefix = 'task';
+
+  static getLsKey(id:number) {
+    return TasksStore.lsKeyPrefix + String(id);
+  }
 }
 
-export default TasksStore.create();
+const store = TasksStore.create();
+
+const applyToLocalStore = (newValue: TaskItem) => {
+  try {
+    localStorage.setItem(TasksStore.getLsKey(newValue.id), JSON.stringify(newValue));
+  } catch (error) { return; }
+};
+const removeFromLocalStore = (newValue: TaskItem) => {
+  try {
+    localStorage.removeItem(TasksStore.getLsKey(newValue.id));
+  } catch (error) { return; }
+};
+
+const handleObserve = (change: IObjectDidChange & {removed: any[], added: any[]}) => {
+  if (change.type === "update") {
+    applyToLocalStore(change.newValue);
+  }
+  if (change.removed?.length) {
+    change.removed.forEach(removeFromLocalStore);
+  }
+  if (change.added?.length) {
+    change.added.forEach(applyToLocalStore);
+  }
+};
+
+observe(store.tasks, handleObserve as (change: IObjectDidChange) => void);
+
+export default store;
