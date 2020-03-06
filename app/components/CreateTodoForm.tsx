@@ -1,5 +1,13 @@
 
-import React, { Reducer, useReducer, useCallback } from 'react';
+import React, {
+  Reducer,
+  useReducer,
+  useCallback,
+  SyntheticEvent,
+  Dispatch,
+  useRef,
+  MutableRefObject
+} from 'react';
 import PropTypes from 'prop-types';
 import {TaskItemRequest} from 'app/stores/TasksStore';
 
@@ -13,6 +21,10 @@ const createTodoDefaultState = {
   }
 };
 
+interface CreateTodoFormRefs {
+  firstInput: MutableRefObject<null|HTMLInputElement>
+}
+
 interface Action {
   type: string,
   payload?: any
@@ -21,12 +33,12 @@ interface Action {
 const createTodoReducer:Reducer<typeof createTodoDefaultState, Action> = (
   state=createTodoDefaultState,
   {type, payload}
-) => {
+):typeof createTodoDefaultState => {
   switch (type) {
     case 'FIELD':
       return {
         ...state,
-        fileds: {
+        fields: {
           ...state.fields,
           [payload.name]: payload.value
         },
@@ -44,6 +56,11 @@ const createTodoReducer:Reducer<typeof createTodoDefaultState, Action> = (
         ...state,
         opened: true
       };
+    case 'CLEAR':
+      return {
+        ...createTodoDefaultState,
+        opened: state.opened
+      };
     case 'ESCAPE':
       return createTodoDefaultState;
     default:
@@ -60,14 +77,18 @@ type TodosProps = {
   onSubmit: (task:TaskItemRequest) => void
 };
 
-const TodoForm = ({onSubmit}:TodosProps):JSX.Element => {
-  const [state, dispatch] = useReducer(createTodoReducer, createTodoDefaultState);
+const useTodoFormHandler = (
+  state: typeof createTodoDefaultState,
+  dispatch:Dispatch<Action>,
+  {onSubmit}:TodosProps,
+  {firstInput}:CreateTodoFormRefs
+) => {
   const validate = useCallback(() => {
     let isValid = true;
     if (!state.fields.info) {
       isValid = false;
       dispatch({
-        type: 'error',
+        type: 'ERROR',
         payload: {
           name: 'info',
           value: 'Required'
@@ -75,12 +96,49 @@ const TodoForm = ({onSubmit}:TodosProps):JSX.Element => {
       });
     }
     return isValid;
-  }, [state]);
+  }, [state, dispatch]);
+
+  const submit = useCallback((event:SyntheticEvent):void =>  {
+    event.preventDefault();
+    if (validate()) {
+      dispatch({type:"CLEAR"});
+      onSubmit({
+        info: state.fields.info,
+        done: false
+      });
+      if (firstInput.current !== null) {
+        firstInput.current.focus();
+      }
+    }
+  }, [firstInput, validate, dispatch]);
+
+  const open = useCallback(():void => dispatch({type: "OPEN"}), [dispatch]);
+
+  const escape = useCallback(() => dispatch({type:"ESCAPE"}), [dispatch]);
+
+  const fieldChange = useCallback(
+    ({target}) => {dispatch({type:"FIELD", payload: {name: target.name, value: target.value}});},
+    [dispatch]
+  );
+
+  return {
+    submit,
+    validate,
+    open,
+    escape,
+    fieldChange
+  };
+};
+
+const TodoForm = (props:TodosProps):JSX.Element => {
+  const [state, dispatch] = useReducer(createTodoReducer, createTodoDefaultState);
+  const firstInput = useRef(null);
+  const handler = useTodoFormHandler(state, dispatch, props, {firstInput});
 
   return (
     <div>
       {!state.opened &&
-        <button onClick={():void => dispatch({type: "OPEN"})}>
+        <button onClick={handler.open}>
           Create
         </button>
       }
@@ -88,19 +146,13 @@ const TodoForm = ({onSubmit}:TodosProps):JSX.Element => {
         <>
           <h3>Create a task</h3>
           <div>
-            <form onSubmit={():void => {
-              if (validate()) {
-                dispatch({type:"ESCAPE"});
-                onSubmit({
-                  info: state.fields.info,
-                  done: false
-                });
-              }
-            }}>
+            <form onSubmit={handler.submit}>
               <label>
                 Task:
                 <input type="text"
+                       ref={firstInput}
                        name="info"
+                       onChange={handler.fieldChange}
                        value={state.fields.info}
                 />
                 {state.errors.info &&
@@ -111,7 +163,7 @@ const TodoForm = ({onSubmit}:TodosProps):JSX.Element => {
                 Create
               </button>
               <button type="button"
-                      onClick={() => dispatch({type:"ESCAPE"})}>
+                      onClick={handler.escape}>
                 Cancel
               </button>
             </form>
