@@ -15,7 +15,7 @@ export class TasksStore {
 
   @observable isDoneFilter:boolean|null = null;
 
-  @observable lastId: number;
+  @observable lastId: number = 0;
 
   getIndexTaskById(targetId:number):number {
     return this.tasks.findIndex(c => c.id === targetId);
@@ -23,7 +23,7 @@ export class TasksStore {
 
   getNextId():number {
     this.lastId += 1;
-    return this.lastId + 1;
+    return this.lastId;
   }
 
   @action clear():void {

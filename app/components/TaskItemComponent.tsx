@@ -11,16 +11,26 @@ const propTypes = {
 
 type TaskItemProps = {
   task: TaskItem,
-  onDelete: (task: TaskItem) => void
+  onDelete: (task: TaskItem) => void,
+  onDoneChange: (task: TaskItem, done: boolean) => void
 };
 
-const TaskItemComponent = ({task, onDelete}: TaskItemProps):JSX.Element => {
+const TaskItemComponent = ({task, onDelete, onDoneChange}: TaskItemProps):JSX.Element => {
   const handleDelete = useCallback(() => {
     onDelete(task);
-  }, []);
+  }, [task]);
+
+  const handleDoneChange = useCallback((event) => {
+    onDoneChange(task, event.target.checked);
+  }, [task]);
 
   return (
-    <li key={task.id}>
+    <li>
+      <input
+        type="checkbox"
+        checked={task.done}
+        onChange={handleDoneChange}
+      />{' '}
       {task.info}
       <button onClick={handleDelete}>X</button>
     </li>

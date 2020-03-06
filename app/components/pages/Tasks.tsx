@@ -33,7 +33,14 @@ const useTodosHandlers = (tasksStore:TasksStore) => {
     onCreateFormSubmit: useCallback(
       (task:TaskItemRequest):void => {tasksStore.createTask(task);},
       []
-    )
+    ),
+    onDoneChange: useCallback(
+      (task, done):void => {tasksStore.updateTask({
+        ...task,
+        done
+      });},
+      []
+    ),
   };
 };
 
@@ -64,6 +71,7 @@ const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
           return (
             <TaskItemComponent
               key={task.id}
+              onDoneChange={handler.onDoneChange}
               task={task}
               onDelete={handler.deleteTask}
             />
