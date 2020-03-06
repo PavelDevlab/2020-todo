@@ -60,6 +60,11 @@
   border-radius: 5px;
   padding: 10px 15px;
 
+  &._mini {
+    font-size: 10px;
+    border-radius: 3px;
+    padding: 3px 5px;
+  }
   &._secondary {
     background: $secondaryColor;
     @include btn-hover-active($secondaryColor);

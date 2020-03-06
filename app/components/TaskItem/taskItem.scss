@@ -1,0 +1,33 @@
+
+@import '../common/vars';
+
+.task {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.done {
+  input {
+    height: 15px;
+    width: 15px;
+  }
+  margin-right: 20px;
+}
+
+.info {
+  font-size: 14px;
+  flex-grow: 1;
+}
+
+.delete {
+  margin-left: 10px;
+}
+
+.header {
+  @extend .task;
+  color: darken($pale, 6%);
+  font-size: 14px;
+}
