@@ -3,10 +3,14 @@ import React, { useCallback } from 'react';
 import { inject, observer } from "mobx-react";
 import {compose} from 'app/services/utils';
 import {TasksStore, TaskItemRequest} from 'app/stores/TasksStore';
-import TodoForm from 'app/components/CreateTodoForm';
-import TaskItemComponent from 'app/components/TaskItemComponent';
+import TodoForm from 'components/CreateTodoForm';
+import TaskItemComponent from 'components/TaskItemComponent';
 
 import PropTypes from "prop-types";
+
+import classNames from 'classnames';
+import taskList from './taskList.scss';
+import withStyles from 'isomorphic-style-loader/withStyles';
 
 const propTypes = {
   tasksStore: PropTypes.object.isRequired
@@ -49,7 +53,7 @@ const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
   const handler = useTodosHandlers(tasksStore); // useTodosHandlers(tasksStore);
 
   return (
-    <div>
+    <div className={classNames(taskList['sheet'], taskList['tasks'])}>
       <h2>Tasks</h2>
       <label>
         <input type="checkbox"
@@ -88,6 +92,7 @@ const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
 Tasks.propTypes = propTypes;
 
 export default compose(
+  withStyles(taskList),
   inject('tasksStore'),
-  observer
+  observer,
 )(Tasks);

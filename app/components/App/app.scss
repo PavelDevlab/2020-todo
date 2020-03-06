@@ -1,0 +1,16 @@
+
+@import './reset-css';
+@import '../common/vars';
+
+body {
+  padding-top: 20px;
+  font-family: Arial, Verdana, "Trebuchet MS";
+  background: $light;
+}
+
+.content {
+  display: block;
+  width: 600px;
+  margin: 0 auto;
+  padding: 0 25px;
+}

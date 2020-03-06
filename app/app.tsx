@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Router } from 'react-router';
-import App from 'app/components/App';
+import App from 'components/App/App';
 
 import StyleContext from 'isomorphic-style-loader/StyleContext';
 import { Provider } from "mobx-react";

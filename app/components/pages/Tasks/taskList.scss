@@ -1,0 +1,18 @@
+
+
+@import '../../common/vars';
+
+.sheet {
+  padding: 20px;
+  background-color: $white;
+  border-radius: 15px;
+  box-shadow: 3px 5px rgba(0,0,0, 0.05);
+}
+
+.tasks {
+  h2 {
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+}
