@@ -9,7 +9,8 @@ import TaskItemComponent from 'components/TaskItemComponent';
 import PropTypes from "prop-types";
 
 import classNames from 'classnames';
-import taskList from './taskList.scss';
+import taskListCSS from './taskList.scss';
+import contentCSS from 'app/components/common/content.scss';
 import withStyles from 'isomorphic-style-loader/withStyles';
 
 const propTypes = {
@@ -53,7 +54,7 @@ const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
   const handler = useTodosHandlers(tasksStore); // useTodosHandlers(tasksStore);
 
   return (
-    <div className={classNames(taskList['sheet'], taskList['tasks'])}>
+    <div className={classNames(taskListCSS['sheet'], taskListCSS['tasks'])}>
       <h2>Tasks</h2>
       <label>
         <input type="checkbox"
@@ -82,6 +83,7 @@ const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
           );
         })}
       </ul>
+      <div className={contentCSS['hr']}></div>
       <TodoForm
         onSubmit={handler.onCreateFormSubmit}
       />
@@ -92,7 +94,7 @@ const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
 Tasks.propTypes = propTypes;
 
 export default compose(
-  withStyles(taskList),
+  withStyles(taskListCSS, contentCSS),
   inject('tasksStore'),
   observer,
 )(Tasks);

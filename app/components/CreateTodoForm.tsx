@@ -6,10 +6,19 @@ import React, {
   SyntheticEvent,
   Dispatch,
   useRef,
+  useEffect,
   MutableRefObject
 } from 'react';
 import PropTypes from 'prop-types';
 import {TaskItemRequest} from 'app/stores/TasksStore';
+
+import classNames from 'classnames';
+
+import withStyles from 'isomorphic-style-loader/withStyles';
+import contentCSS from './common/content.scss';
+import formCSS from './common/form.scss';
+
+const ESCAPE_CODE = 27;
 
 const createTodoDefaultState = {
   opened: false,
@@ -121,7 +130,13 @@ const useTodoFormHandler = (
     [dispatch]
   );
 
+  const keyDown = useCallback(
+    ({keyCode}) => {ESCAPE_CODE === keyCode && dispatch({type:"ESCAPE"});},
+    []
+  );
+
   return {
+    keyDown,
     submit,
     validate,
     open,
@@ -132,40 +147,48 @@ const useTodoFormHandler = (
 
 const TodoForm = (props:TodosProps):JSX.Element => {
   const [state, dispatch] = useReducer(createTodoReducer, createTodoDefaultState);
-  const firstInput = useRef(null);
+  const firstInput:MutableRefObject<null|HTMLInputElement> = useRef(null);
   const handler = useTodoFormHandler(state, dispatch, props, {firstInput});
 
+  useEffect(() => {
+    if (state.opened && firstInput.current !== null) {
+      firstInput.current.focus();
+    }
+  }, [state.opened]);
+
   return (
-    <div>
+    <div className={formCSS['form']}>
       {!state.opened &&
-        <button onClick={handler.open}>
+        <button className={formCSS['btn']} onClick={handler.open}>
           Create
         </button>
       }
       {state.opened &&
         <>
-          <h3>Create a task</h3>
           <div>
-            <form onSubmit={handler.submit}>
-              <label>
+            <form onSubmit={handler.submit} onKeyUp={handler.keyDown}>
+              <label className={formCSS['label']}>
                 Task:
                 <input type="text"
+                       className={formCSS['input']}
                        ref={firstInput}
                        name="info"
                        onChange={handler.fieldChange}
                        value={state.fields.info}
                 />
                 {state.errors.info &&
-                  <div>{state.errors.info}</div>
+                  <div className={formCSS['error']}>{state.errors.info}</div>
                 }
               </label>
-              <button type="submit">
-                Create
-              </button>
-              <button type="button"
-                      onClick={handler.escape}>
-                Cancel
-              </button>
+              <div className={formCSS['btn-group']}>
+                <button className={formCSS['btn']} type="submit">
+                  Create
+                </button>
+                <button className={classNames(formCSS['btn'], formCSS['_secondary'])} type="button"
+                        onClick={handler.escape}>
+                  Cancel
+                </button>
+              </div>
             </form>
           </div>
         </>
@@ -176,4 +199,4 @@ const TodoForm = (props:TodosProps):JSX.Element => {
 
 TodoForm.propTypes = propTypes;
 
-export default TodoForm;
+export default withStyles(contentCSS, formCSS)(TodoForm);

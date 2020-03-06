@@ -1,0 +1,9 @@
+
+@import './vars';
+
+.hr {
+  border-top: 1px solid $gray;
+  height: 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
