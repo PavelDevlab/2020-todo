@@ -1,5 +1,4 @@
 
-import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
 import {TaskItem} from 'app/stores/TasksStore';
 import { observer } from "mobx-react";
@@ -10,18 +9,13 @@ import withStyles from 'isomorphic-style-loader/withStyles';
 import formCSS from '../common/form.scss';
 import taskItemCSS from './taskItem.scss';
 
-const propTypes = {
-  task: PropTypes.object.isRequired,
-  onDelete: PropTypes.func.isRequired
-};
-
-type TaskItemProps = {
+interface TaskItemProps {
   task: TaskItem,
   onDelete: (task: TaskItem) => void,
   onDoneChange: (task: TaskItem, done: boolean) => void
 };
 
-const TaskItemCompoennt = ({task, onDelete, onDoneChange}: TaskItemProps):JSX.Element => {
+const TaskItemCompoennt:React.FunctionComponent<TaskItemProps> = ({task, onDelete, onDoneChange}) => {
   const handleDelete = useCallback(() => {
     onDelete(task);
   }, [task]);
@@ -48,8 +42,6 @@ const TaskItemCompoennt = ({task, onDelete, onDoneChange}: TaskItemProps):JSX.El
     </li>
   );
 };
-
-TaskItemCompoennt.propTypes = propTypes;
 
 export default compose(
   observer,

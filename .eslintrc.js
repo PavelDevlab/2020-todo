@@ -26,6 +26,7 @@ module.exports = {
     "semi": "error",
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
+    "react/prop-types": "off",
 
     // "linebreak-style": "off", // Неправильно работает в Windows.
 

@@ -8,7 +8,7 @@ import Tasks from 'components/pages/Tasks/Tasks';
 import appCSS from './app.scss';
 import withStyles from "isomorphic-style-loader/withStyles";
 
-const App = ():JSX.Element => {
+const App:React.FunctionComponent<{}> = () => {
 
     return (
         <div className={appCSS['content']}>

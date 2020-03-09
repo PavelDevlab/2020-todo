@@ -6,8 +6,6 @@ import {TasksStore, TaskItemRequest} from 'app/stores/TasksStore';
 import TodoForm from 'app/components/CreateTodoForm';
 import TaskItemComponent from 'app/components/TaskItem/TaskItem';
 
-import PropTypes from "prop-types";
-
 import classNames from 'classnames';
 import formCSS from '../../common/form.scss';
 import taskListCSS from './taskList.scss';
@@ -15,11 +13,7 @@ import contentCSS from 'app/components/common/content.scss';
 import taskItemCSS from '../../TaskItem/taskItem.scss';
 import withStyles from 'isomorphic-style-loader/withStyles';
 
-const propTypes = {
-  tasksStore: PropTypes.object.isRequired
-};
-
-type TasksProps = {
+interface TasksProps {
   tasksStore: TasksStore
 };
 
@@ -51,7 +45,7 @@ const useTodosHandlers = (tasksStore:TasksStore) => {
   };
 };
 
-const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
+const Tasks:React.FunctionComponent<TasksProps> = ({tasksStore}) => {
 
   const handler = useTodosHandlers(tasksStore); // useTodosHandlers(tasksStore);
 
@@ -108,8 +102,6 @@ const Tasks = ({tasksStore}:TasksProps):JSX.Element => {
     </div>
   );
 };
-
-Tasks.propTypes = propTypes;
 
 export default compose(
   withStyles(taskListCSS, contentCSS, formCSS, taskItemCSS),

@@ -82,7 +82,7 @@ const propTypes = {
   onSubmit: PropTypes.func.isRequired
 };
 
-type TodosProps = {
+interface TodosProps {
   onSubmit: (task:TaskItemRequest) => void
 };
 
@@ -145,7 +145,7 @@ const useTodoFormHandler = (
   };
 };
 
-const TodoForm = (props:TodosProps):JSX.Element => {
+const TodoForm:React.FunctionComponent<TodosProps> = (props) => {
   const [state, dispatch] = useReducer(createTodoReducer, createTodoDefaultState);
   const firstInput:MutableRefObject<null|HTMLInputElement> = useRef(null);
   const handler = useTodoFormHandler(state, dispatch, props, {firstInput});
